@@ -1,0 +1,73 @@
+package main
+
+import scala.io.StdIn
+import scala.annotation.tailrec
+
+import board.Player
+import board.Board
+import board.Tile
+import board.EndGame
+import board.Turn
+
+object Game {
+  def main(args: Array[String]): Unit = {
+    var board = Game.getBoard()
+    makeTurn(board, Player.PlayerX)
+  }
+  @tailrec
+  def getBoard(): Board = {
+    print("Choose board size: ")
+    val input = StdIn.readLine().toIntOption
+    input match {
+      case Some(n) => return Board.newBoard(n);
+      case None => {
+        println("Bad format!")
+        return getBoard()
+      }
+    }
+  }
+  @tailrec
+  def makeTurn(board: Board, player: Player.Player): Unit = {
+    board.drawCheck match {
+      case Some(draw) => return endGame(board, draw);
+      case _ => ;
+    }
+    printBoard(board)
+    val turn = getTurn(player)
+    val status = board.execTurn(turn)
+    if (status) {
+      board.winCheck match {
+        case Some(eg) => endGame(board, eg);
+        case None => makeTurn(board, Player.next(player));
+      }
+    } else {
+      println("Can't move there!")
+      makeTurn(board, player)
+    }
+  }
+  def endGame(board: Board, eg: EndGame.EndGame): Unit = {
+    printBoard(board)
+    EndGame.printEndGame(eg)
+    System.exit(0)
+  }
+  def printBoard(board: Board): Unit = {
+    board.getTiles().foreach(line => {
+      line.foreach(tile => {
+        Tile.printTile(tile)
+        print(" ")
+      })
+      println("")
+    })
+  }
+  @tailrec
+  def getTurn(player: Player.Player): Turn = {
+    Player.printPlayer(player)
+    println(": take your turn!")
+    val input = StdIn.readLine().split(' ')
+    if (input.head != ' ' && input.last != ' ' && input.length == 2) {
+      return Turn.newTurn(player, input.head.toInt - 1, input.last.toInt - 1)
+    }
+      println("Incorrect tile format!")
+      getTurn(player)
+  }
+}
