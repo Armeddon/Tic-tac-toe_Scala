@@ -15,10 +15,10 @@ object Game {
     print("Choose board size: ")
     val input = StdIn.readLine().toIntOption
     input match {
-      case Some(n) => return Board.newBoard(n);
+      case Some(n) => new Board(n)
       case None => {
         println("Bad format!")
-        return getBoard()
+        getBoard()
       }
     }
   }
@@ -26,7 +26,7 @@ object Game {
   def makeTurn(board: Board, player: Player.Player): Unit = {
     board.drawCheck match {
       case Some(draw) => return endGame(board, draw);
-      case _ => ;
+      case _ => 
     }
     printBoard(board)
     val turn = getTurn(player)
@@ -47,7 +47,7 @@ object Game {
     System.exit(0)
   }
   def printBoard(board: Board): Unit = {
-    board.getTiles().foreach(line => {
+    board.tiles.foreach(line => {
       line.foreach(tile => {
         Tile.printTile(tile)
         print(" ")
@@ -62,7 +62,7 @@ object Game {
     val input = StdIn.readLine().split(' ')
     if (input.head != ' ' && input.last != ' ' && input.length == 2) {
       if (input.head.toIntOption.isDefined && input.last.toIntOption.isDefined)
-        Turn.newTurn(player, input.head.toInt - 1, input.last.toInt - 1)
+        new Turn(player, input.head.toInt - 1, input.last.toInt - 1)
       else {
         println("Not a number!")
         getTurn(player)

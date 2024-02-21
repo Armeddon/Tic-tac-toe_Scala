@@ -5,9 +5,9 @@ object EndGame extends Enumeration {
   val WinX, WinO, Draw = Value
   def printEndGame(eg: EndGame): Unit = 
     println(eg match {
-      case WinX => "Player X wins!";
-      case WinO => "Player O wins!";
-      case Draw => "The game ends in a draw!";
+      case WinX => "Player X wins!"
+      case WinO => "Player O wins!"
+      case Draw => "The game ends in a draw!"
     })
 }
 import EndGame._
@@ -17,18 +17,18 @@ object Player extends Enumeration {
   val PlayerX, PlayerO = Value
   def printPlayer(player: Player): Unit =
     print(player match {
-      case PlayerX => "Player 1";
-      case PlayerO => "Player 2";
+      case PlayerX => "Player 1"
+      case PlayerO => "Player 2"
     })
   def next(player: Player): Player =
     player match {
-      case PlayerO => PlayerX;
-      case PlayerX => PlayerO;
+      case PlayerO => PlayerX
+      case PlayerX => PlayerO
     }
   def win(player: Player): EndGame =
     player match {
-      case PlayerO => WinO;
-      case PlayerX => WinX;
+      case PlayerO => WinO
+      case PlayerX => WinX
     }
 }
 import Player._
@@ -38,25 +38,22 @@ object Tile extends Enumeration {
   val TileEmpty, TileX, TileO = Value
   def printTile(tl: Tile): Unit =
     print(tl match {
-      case TileEmpty => ".";
-      case TileX => "X";
-      case TileO => "O";
+      case TileEmpty => "."
+      case TileX => "X"
+      case TileO => "O"
     })
 }
 import Tile._
 
-final class Turn(player: Player, x: Int, y: Int) {
-  def getCoords(): (Int, Int) = (x, y)
-  def getPlayer(): Player = player
-}
-object Turn {
-  def newTurn(player: Player, x: Int, y: Int) =
-    new Turn(player, x, y)
-}
+final class Turn(val player: Player, val x: Int, val y: Int)
 
-final class Board(tiles: Array[Array[Tile]], size: Int) {
-  def getTiles(): Array[Array[Tile]] = 
-    tiles
+final class Board(val size: Int) {
+  val tiles: Array[Array[Tile]] = 
+    (for(i <- 0 until size) yield 
+      (for(j <- 0 until size) yield
+        Tile.TileEmpty
+        ).toArray
+      ).toArray
   def winCheck(): Option[EndGame] = {
     val rows: Option[Player] = tiles
       .map(Board.isSamePlayer(_))
@@ -97,13 +94,13 @@ final class Board(tiles: Array[Array[Tile]], size: Int) {
     else
       None
   def execTurn(trn: Turn): Boolean = {
-    if (!inside(trn.getCoords()._1) || !inside(trn.getCoords()._2))
+    if (!inside(trn.x) || !inside(trn.y))
       return false
-    if (tiles(trn.getCoords()._1)(trn.getCoords()._2) != TileEmpty)
+    if (tiles(trn.x)(trn.y) != TileEmpty)
       return false
-    tiles(trn.getCoords()._1)(trn.getCoords()._2) = trn.getPlayer() match {
-      case PlayerX => TileX;
-      case PlayerO => TileO;
+    tiles(trn.x)(trn.y) = trn.player match {
+      case PlayerX => TileX
+      case PlayerO => TileO
     }
     true
   }
@@ -111,18 +108,12 @@ final class Board(tiles: Array[Array[Tile]], size: Int) {
     x >= 0 && x < size
 }
 object Board {
-  def newBoard(n: Int): Board =
-    new Board(
-      tiles = (0 until n).map(_ =>
-          (0 until n).map(_ => TileEmpty).toArray
-          ).toArray,
-        size = n)
   def isSamePlayer(tiles: Array[Tile]): Option[Player] = {
     tiles
       .map(_ match {
-        case TileX => Some(PlayerX);
-        case TileO => Some(PlayerO);
-        case _ => None;
+        case TileX => Some(PlayerX)
+        case TileO => Some(PlayerO)
+        case _ => None
       })
         .reduce((t1, t2) => if (t1 == t2) t1 else None)
   }
