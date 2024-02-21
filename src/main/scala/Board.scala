@@ -45,7 +45,7 @@ object Tile extends Enumeration {
 }
 import Tile._
 
-class Turn(player: Player, x: Int, y: Int) {
+final class Turn(player: Player, x: Int, y: Int) {
   def getCoords(): (Int, Int) = (x, y)
   def getPlayer(): Player = player
 }
@@ -54,7 +54,7 @@ object Turn {
     new Turn(player, x, y)
 }
 
-class Board(tiles: Array[Array[Tile]], size: Int) {
+final class Board(tiles: Array[Array[Tile]], size: Int) {
   def getTiles(): Array[Array[Tile]] = 
     tiles
   def winCheck(): Option[EndGame] = {
@@ -97,6 +97,8 @@ class Board(tiles: Array[Array[Tile]], size: Int) {
     else
       None
   def execTurn(trn: Turn): Boolean = {
+    if (!inside(trn.getCoords()._1) || !inside(trn.getCoords()._2))
+      return false
     if (tiles(trn.getCoords()._1)(trn.getCoords()._2) != TileEmpty)
       return false
     tiles(trn.getCoords()._1)(trn.getCoords()._2) = trn.getPlayer() match {
@@ -105,6 +107,8 @@ class Board(tiles: Array[Array[Tile]], size: Int) {
     }
     true
   }
+  def inside(x: Int): Boolean =
+    x >= 0 && x < size
 }
 object Board {
   def newBoard(n: Int): Board =

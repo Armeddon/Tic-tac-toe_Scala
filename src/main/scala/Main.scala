@@ -3,11 +3,7 @@ package main
 import scala.io.StdIn
 import scala.annotation.tailrec
 
-import board.Player
-import board.Board
-import board.Tile
-import board.EndGame
-import board.Turn
+import board.{Player, Board, Tile, EndGame, Turn}
 
 object Game {
   def main(args: Array[String]): Unit = {
@@ -65,9 +61,15 @@ object Game {
     println(": take your turn!")
     val input = StdIn.readLine().split(' ')
     if (input.head != ' ' && input.last != ' ' && input.length == 2) {
-      return Turn.newTurn(player, input.head.toInt - 1, input.last.toInt - 1)
-    }
+      if (input.head.toIntOption.isDefined && input.last.toIntOption.isDefined)
+        Turn.newTurn(player, input.head.toInt - 1, input.last.toInt - 1)
+      else {
+        println("Not a number!")
+        getTurn(player)
+      }
+    } else {
       println("Incorrect tile format!")
-      getTurn(player)
+      return getTurn(player)
+    }
   }
 }
